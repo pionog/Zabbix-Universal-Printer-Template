@@ -15,6 +15,131 @@ zabbix_export:
         - name: Templates
         - name: Templates/Printers
       items:
+        - uuid: fd9169aff79c4c58a7574cf74b5a228f
+          name: 'Printer error status'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.25.3.5.1.2.1
+          key: hrPrinterDetectedErrorState
+          delay: 0;wd1-5h7-17m/10
+          history: 7d
+          description: |
+            To read error status you have to
+            First: convert this number from decimal to binary,
+            Second: read on which positions (counting from 0) bites are "1".
+            ---
+            List of errors:
+            0 - Low paper
+            1 - No paper
+            2 - Low toner
+            3 - No toner
+            4 - Door open
+            5 - Jammed
+            6 - Offline
+            7 - Service requested
+            8 - Input tray is missing
+            9 - Output tray is missing
+            10 - Marker supply is missing
+            11 - Output tray is nearly full
+            12 - Output tray is full
+            13 - Input tray is empty
+            14 - Overdue preventive maintenance
+            15 - Not assigned
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var oneByte;
+                  value.length / 4 < 1 ? oneByte = true : oneByte = false;
+                  if(oneByte == true) return 256 * parseInt(value, 16);
+                  else {
+                  var splitValues = value.split(' ');
+                  return parseInt(splitValues[0], 16) * 256 + parseInt(splitValues[1], 16);
+                  }
+          triggers:
+            - uuid: 350fab8563ee4de7bebcf67c12b1f535
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),2048)=2048'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),2048)=0'
+              name: 'Door is open'
+              priority: AVERAGE
+              manual_close: 'YES'
+            - uuid: a85d4241186e4ae99fc2781e6a3aadc4
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),128)=128'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),128)=0'
+              name: 'Input tray is missing'
+              priority: AVERAGE
+              manual_close: 'YES'
+            - uuid: e68680ece66b4017864a2741bc3a0c98
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),32768)=32768'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),32768)=0'
+              name: 'Low paper'
+              priority: WARNING
+              manual_close: 'YES'
+            - uuid: f2adada8dfc64a668936eda506f8e3cc
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),8192)=8192'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),8192)=0'
+              name: 'Low toner'
+              priority: WARNING
+              manual_close: 'YES'
+            - uuid: cc6bc4f22fdc46058feeef6c46f0fdc7
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),32)=32'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),32)=0'
+              name: 'Marker supply is missing'
+              priority: AVERAGE
+              manual_close: 'YES'
+            - uuid: f261a3c327a048aa90fb861fff5ac35b
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),16384)=16384'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),16384)=0'
+              name: 'No paper'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: 7640ef9166904f5ab5b816db4b2a4d5e
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),4096)=4096'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),4096)=0'
+              name: 'No toner'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: ef555ab94bda47b99c6a14b37f3e332a
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),8)=8'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),8)=0'
+              name: 'Output is full'
+              priority: AVERAGE
+              manual_close: 'YES'
+            - uuid: dfe370a127f948aeaab19d890a8bb851
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),64)=64'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),64)=0'
+              name: 'Output tray is missing'
+              priority: AVERAGE
+              manual_close: 'YES'
+            - uuid: af1bac8f047a4cc7bc741cc8b7b46fd9
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),1024)=1024'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),1024)=0'
+              name: 'Paper jam'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: 880425e1727149bcb071b37a30e35ea9
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),512)=512'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),512)=0'
+              name: 'Printer is offline'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: 0e9cb12b1b1d43f2878c4146548f867b
+              expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),256)=256'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'bitand(last(/Printer/hrPrinterDetectedErrorState),512)=0'
+              name: 'Service is requested'
+              priority: AVERAGE
+              manual_close: 'YES'
         - uuid: 4488f011194640528e912d1f2ec7c230
           name: 'Black toner'
           type: CALCULATED
@@ -75,6 +200,12 @@ zabbix_export:
             - type: CHECK_NOT_SUPPORTED
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Can''t find any toners'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           tags:
             - tag: class
               value: toner
@@ -88,6 +219,12 @@ zabbix_export:
           units: '%'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           tags:
@@ -129,6 +266,12 @@ zabbix_export:
             - type: CHECK_NOT_SUPPORTED
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           tags:
             - tag: class
               value: toner
@@ -142,6 +285,12 @@ zabbix_export:
           units: '%'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           tags:
