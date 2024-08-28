@@ -13,6 +13,7 @@ I don't know if this template works on other companies' color printers.
 - Total number of printed pages
 - Printer model
 - Color mode (CMYK, KCMY, YMCK)
+- Error status (written in decimal number instead of binary array)
 
 ## Todo
 
