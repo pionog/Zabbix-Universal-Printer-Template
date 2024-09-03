@@ -3,6 +3,7 @@
 My attempt to make a universal printer template in Zabbix 6.4.
 
 It works fine on Konica Minolta and HP color printers (at least they seem to work for me on KM bizhub c250i and some hp officejet pro / laserjet pro printers).
+Sadly on Lexmark printers it doesn't work properly as they made it impossible to retrieve information about toners without creating some workarounds with their reordering. (tested on Lexmark XC4240)
 I don't know if this template works on other companies' color printers.
 
 ### Important - To use this template you have to enable communication with your printers through SNMP version 1 or version 2C.
